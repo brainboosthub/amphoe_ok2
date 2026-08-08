@@ -83,35 +83,36 @@ const esc = value =>
         .join('');
 
 
-    /* คลิกการ์ด */
+    /* เปิดรายการแหล่งเรียนรู้ของตำบลที่เลือก */
+
+    const openArea = card => {
+      const sheetId = card.dataset.areaSheet;
+      const areaName = card.dataset.areaName;
+
+      if (!sheetId) return;
+
+      const url = new URL(
+        'learning.html',
+        window.location.href
+      );
+
+      url.searchParams.set('spreadsheetId', sheetId);
+      url.searchParams.set('area', areaName || '');
+
+      window.location.href = url.href;
+    };
 
     grid
       .querySelectorAll('[data-area-sheet]')
       .forEach(card => {
+        card.addEventListener('click', () => openArea(card));
 
-        card.addEventListener(
-          'click',
-          () => {
+        card.addEventListener('keydown', event => {
+          if (event.key !== 'Enter' && event.key !== ' ') return;
 
-            const sheetId =
-              card.dataset.areaSheet;
-
-            const areaName =
-              card.dataset.areaName;
-
-            if (!sheetId) return;
-
-
-            const url =
-              'learning.html?spreadsheetId=' +
-              encodeURIComponent(sheetId) +
-              '&area=' +
-              encodeURIComponent(areaName || '');
-
-            window.location.href = url;
-
-          }
-        );
+          event.preventDefault();
+          openArea(card);
+        });
 
       });
 
