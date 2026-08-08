@@ -2667,9 +2667,22 @@ function loadLearningSheetOptions() {
           </option>
         `).join('');
 
-        // รายการแรก = A2/B2
-        currentSpreadsheetId =
-          String(items[0].spreadsheetId || '').trim();
+        // ถ้าเปิดจากการ์ดตำบล ให้ใช้ Spreadsheet ID ของการ์ดนั้น
+        // แต่ยอมรับเฉพาะ ID ที่มีอยู่ในรายการจาก Master Sheet เท่านั้น
+        const requestedSpreadsheetId = String(
+          new URLSearchParams(window.location.search)
+            .get('spreadsheetId') || ''
+        ).trim();
+
+        const requestedItem = items.find(item =>
+          String(item.spreadsheetId || '').trim() ===
+          requestedSpreadsheetId
+        );
+
+        // กด "ดูรายการทั้งหมด" โดยไม่มีพารามิเตอร์ ยังคงใช้ A2/B2 เหมือนเดิม
+        currentSpreadsheetId = requestedItem
+          ? requestedSpreadsheetId
+          : String(items[0].spreadsheetId || '').trim();
 
         select.value = currentSpreadsheetId;
 
