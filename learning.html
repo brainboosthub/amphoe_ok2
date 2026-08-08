@@ -1621,7 +1621,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
     await loadLearningSheetOptions();
-    await loadAreaFilter();
     loadPublicData();
   } catch (error) {
     showError(error);
@@ -1652,54 +1651,25 @@ function bindEvents() {
 }
 
 
-function loadAreaFilter() {
-  return new Promise((resolve, reject) => {
+function fillAreaFilter(areas) {
+  const areaSelect = document.getElementById('areaFilter');
 
-    const areaSelect =
-      document.getElementById('areaFilter');
+  if (!areaSelect) return;
 
-    if (!areaSelect) {
-      resolve();
-      return;
-    }
+  const cleanAreas = [...new Set(
+    (Array.isArray(areas) ? areas : [])
+      .filter(area => typeof area === 'string')
+      .map(area => area.trim())
+      .filter(Boolean)
+  )].sort((a, b) => a.localeCompare(b, 'th'));
 
-    areaSelect.innerHTML =
-      '<option value="">กำลังโหลดรายการ...</option>';
-
-    jsonpRequest(
-      'learningAreas',
-
-      {
-        spreadsheetId: currentSpreadsheetId
-      },
-
-      function(result) {
-
-        const areas =
-          Array.isArray(result.areas)
-            ? result.areas
-            : [];
-
-        areaSelect.innerHTML =
-          '<option value="">ทุกพื้นที่</option>' +
-          areas.map(area => `
-            <option value="${escAttr(area)}">
-              ${esc(area)}
-            </option>
-          `).join('');
-
-        resolve();
-      },
-
-      function(error) {
-        areaSelect.innerHTML =
-          '<option value="">ทุกพื้นที่</option>';
-
-        reject(error);
-      }
-    );
-
-  });
+  areaSelect.innerHTML =
+    '<option value="">ทุกพื้นที่</option>' +
+    cleanAreas.map(area => `
+      <option value="${escAttr(area)}">
+        ${esc(area)}
+      </option>
+    `).join('');
 }
 function loadPublicData() {
 
@@ -1719,10 +1689,12 @@ function loadPublicData() {
       appData = data || {
         settings: {},
         sources: [],
-        types: []
+        types: [],
+        areas: []
       };
 
       applySettings();
+      fillAreaFilter(appData.areas);
       fillFilters();
       applyFilters();
       updateStats();
@@ -2698,7 +2670,7 @@ function loadLearningSheetOptions() {
     );
   });
 }
-async function changeLearningSheet() {
+function changeLearningSheet() {
 
   const select =
     document.getElementById('learningSheetSelect');
@@ -2708,13 +2680,7 @@ async function changeLearningSheet() {
 
   if (!currentSpreadsheetId) return;
 
-  try {
-    await loadAreaFilter();
-    loadPublicData();
-
-  } catch (error) {
-    showError(error);
-  }
+  loadPublicData();
 }
   </script>
 </body>
