@@ -2667,21 +2667,20 @@ function loadLearningSheetOptions() {
           </option>
         `).join('');
 
-        // ถ้าเปิดจากการ์ดตำบล ให้ใช้ Spreadsheet ID ของการ์ดนั้น
-        // แต่ยอมรับเฉพาะ ID ที่มีอยู่ในรายการจาก Master Sheet เท่านั้น
-        const requestedSpreadsheetId = String(
+        // URL แสดงเฉพาะชื่อตำบล ไม่แสดง Spreadsheet ID
+        // จากนั้นค้นหา ID ที่ตรงกันจากรายการของ Master Sheet ภายในระบบ
+        const requestedArea = String(
           new URLSearchParams(window.location.search)
-            .get('spreadsheetId') || ''
+            .get('area') || ''
         ).trim();
 
         const requestedItem = items.find(item =>
-          String(item.spreadsheetId || '').trim() ===
-          requestedSpreadsheetId
+          String(item.name || '').trim() === requestedArea
         );
 
         // กด "ดูรายการทั้งหมด" โดยไม่มีพารามิเตอร์ ยังคงใช้ A2/B2 เหมือนเดิม
         currentSpreadsheetId = requestedItem
-          ? requestedSpreadsheetId
+          ? String(requestedItem.spreadsheetId || '').trim()
           : String(items[0].spreadsheetId || '').trim();
 
         select.value = currentSpreadsheetId;
