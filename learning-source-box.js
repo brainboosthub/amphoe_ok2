@@ -86,20 +86,24 @@ const esc = value =>
     /* เปิดรายการแหล่งเรียนรู้ของตำบลที่เลือก */
 
     const openArea = card => {
-      const sheetId = card.dataset.areaSheet;
       const areaName = card.dataset.areaName;
 
-      if (!sheetId) return;
+      if (!areaName) return;
 
       const url = new URL(
         'learning.html',
         window.location.href
       );
 
-      url.searchParams.set('spreadsheetId', sheetId);
-      url.searchParams.set('area', areaName || '');
+      // ไม่ส่ง Spreadsheet ID ไปใน URL
+      // learning.html จะค้นหา ID จากชื่อตำบลภายในระบบ
+      url.searchParams.set('area', areaName);
 
-      window.location.href = url.href;
+      window.open(
+        url.href,
+        '_blank',
+        'noopener,noreferrer'
+      );
     };
 
     grid
